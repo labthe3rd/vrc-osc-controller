@@ -10,6 +10,12 @@ An example OSC controller applicaiton to interface with VRChat's OSC commands fo
 - Control your avatar
 - Write to a chat box
 
+## Instructions
+
+1. Start VRChat in VR or Desktop
+2. Start Application
+3. Start using the app!
+
 ## **References**
 
 ### vrc-osc-chatbox
