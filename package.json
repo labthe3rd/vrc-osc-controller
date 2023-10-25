@@ -3,7 +3,7 @@
   "name": "vrc-osc-controller",
   "productName": "vrc-osc-controller",
   "description": "An application that sends OSC commands to VRChat",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "labthe3rd <labthe3rd@gmail.com>",
   "main": "app/background.js",
   "scripts": {
@@ -11,6 +11,9 @@
     "build": "nextron build",
     "postinstall": "electron-builder install-app-deps",
     "packager": "electron-packager ./ --platform=win32"
+  },
+  "build": {
+    "icon": "/resources/icon"
   },
   "dependencies": {
     "electron-packager": "^17.1.2",

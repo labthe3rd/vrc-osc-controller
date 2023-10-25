@@ -11,15 +11,15 @@ let messageResponseCallback = null;
 
 //Set up IPC handlers
 const handler = {
-  //Strafe movement commands for OPC
+  //Strafe movement commands for OSC
   sendMoveCommand: (direction, value) => {
     ipcRenderer.send("send-move-command", direction, value);
   },
-  //Rotation commands for OPC
+  //Rotation commands for OSC
   sendRotationCommand: (value) => {
     ipcRenderer.send("send-rotation-command", value);
   },
-  //Chatbox command OPC
+  //Chatbox command OSC
   sendMessage: (message) => {
     ipcRenderer.send("send-message", message);
   },

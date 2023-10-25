@@ -1,12 +1,12 @@
-/*  programmer:   labthe3rd
+/*
+ *  programmer:   labthe3rd
  *  date:         10/24/23
- *  desc:         React logic for OSC Controller logic
+ *  desc:         Index page of react app
+ *  fileName:     /renderer/pages/home.jsx
  */
 
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
-import Link from "next/link";
-import Image from "next/image";
 import ConfigForm from "../components/ConfigForm";
 import PlayerControls from "../components/PlayerControls";
 
@@ -27,29 +27,38 @@ export default function HomePage() {
             <h1 id="title" className="text-center text-sm font-bold">
               OSC Controller
             </h1>
-            <p
-              id="title"
-              className="text-center text-xs font-bold text-blue-500"
-            >
-              Created by labthe3rd
-            </p>
+            <div className="text-center">
+              <span
+                id="title"
+                className="inline-block align-middle text-xs font-bold text-blue-700"
+              >
+                Created by labthe3rd
+              </span>
+            </div>
+
             <div className="flex justify-center space-x-4">
-              <button
-                onClick={() => setCurrentView("Play")}
-                className={`p-2 ${
-                  currentView === "Play" ? "bg-blue-500 text-white" : ""
-                }`}
-              >
-                Play
-              </button>
-              <button
-                onClick={() => setCurrentView("Config")}
-                className={`p-2 ${
-                  currentView === "Config" ? "bg-blue-500 text-white" : ""
-                }`}
-              >
-                Config
-              </button>
+              <div className="grid grid-cols-2">
+                <button
+                  onClick={() => setCurrentView("Play")}
+                  className={`p-2 ${
+                    currentView === "Play"
+                      ? "bg-blue-500 text-white"
+                      : "bg-blue-300 text-white"
+                  }`}
+                >
+                  Play
+                </button>
+                <button
+                  onClick={() => setCurrentView("Config")}
+                  className={`p-2 ${
+                    currentView === "Config"
+                      ? "bg-blue-500 text-white"
+                      : "bg-blue-300 text-white"
+                  }`}
+                >
+                  Config
+                </button>
+              </div>
             </div>
 
             {currentView === "Play" && (
