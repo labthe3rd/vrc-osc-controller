@@ -27,6 +27,12 @@ const handler = {
   setResponseCallback: (callback) => {
     messageResponseCallback = callback;
   },
+  getConfig: () => {
+    return ipcRenderer.invoke("get-config");
+  },
+  updateConfig: (newConfig) => {
+    return ipcRenderer.invoke("update-config", newConfig);
+  },
 };
 
 //Not sure if I need this...
@@ -40,17 +46,3 @@ ipcRenderer.on("message-response", (event, response) => {
 });
 
 contextBridge.exposeInMainWorld("ipc", handler);
-
-// const handler = {
-//   send(channel, value) {
-//     ipcRenderer.send(channel, value)
-//   },
-//   on(channel, callback) {
-//     const subscription = (_event, ...args) => callback(...args)
-//     ipcRenderer.on(channel, subscription)
-
-//     return () => {
-//       ipcRenderer.removeListener(channel, subscription)
-//     }
-//   },
-// }

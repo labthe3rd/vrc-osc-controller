@@ -9,6 +9,7 @@ import { app, ipcMain } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
 import osc from "osc";
+import fs from "fs";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -42,13 +43,40 @@ app.on("window-all-closed", () => {
   app.quit();
 });
 
-//Define and start udp port
-let udpPort = new osc.UDPPort({
+//Get port info from config.json
+// Default configuration
+const defaultConfig = {
   localAddress: "0.0.0.0",
-  localPort: 57121,
+  localPort: 9001,
   remoteAddress: "127.0.0.1",
   remotePort: 9000,
+};
+
+// Path to the user-specific config
+const configPath = path.join(app.getPath("userData"), "config.json");
+
+let config;
+
+// Check if the user-specific config exists
+if (fs.existsSync(configPath)) {
+  config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+} else {
+  // If not, use the default configuration and create the user config
+  config = defaultConfig;
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
+console.log(configPath);
+
+//Create UDP Port instance
+let udpPort = new osc.UDPPort({
+  localAddress: config.localAddress,
+  localPort: config.localPort,
+  remoteAddress: config.remoteAddress,
+  remotePort: config.remotePort,
 });
+
+//Open udp port
 udpPort.open();
 
 //Utility functions
@@ -122,4 +150,17 @@ ipcMain.on("send-message", (event, message) => {
   sendMessage(message);
   console.log(`Sending message: ${message}`);
   event.reply("message-response", { status: "ok" });
+});
+
+// Add IPC handlers for getting and updating the config
+
+ipcMain.handle("get-config", () => {
+  return config;
+});
+
+ipcMain.handle("update-config", (event, newConfig) => {
+  // Overwrite the existing configuration
+  config = { ...config, ...newConfig };
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  return { status: "success" };
 });
