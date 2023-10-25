@@ -17,6 +17,18 @@ export default function PlayerControls({ messageHistory, setMessageHistory }) {
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  //Prevent duplicate commands being sent
+
+  //Active keys for color changing effect of buttons
+  const [activeKeys, setActiveKeys] = useState({
+    W: false,
+    A: false,
+    S: false,
+    D: false,
+    Q: false,
+    E: false,
+  });
+
   //Response callback for when message is sent and a response is received
   //Add the previous message to the history with a timestamp
   useEffect(() => {
@@ -44,6 +56,109 @@ export default function PlayerControls({ messageHistory, setMessageHistory }) {
       }
     });
   }, [messageInput]); // Depend on messageInput so the callback has the latest value
+
+  //Handle all key press scenarios for added control capabilities
+  useEffect(() => {
+    const handleKeydown = (event) => {
+      //Prevent keyboard from repeating the keydown event
+      if (event.repeat) return;
+      // Check if the event target is the message input, and if so, exit early
+      if (event.target.id === "message-text-box") {
+        return;
+      }
+      switch (event.key) {
+        case "W":
+        case "w":
+          sendMoveCommand("Vertical", 1);
+          break;
+        case "A":
+        case "a":
+          sendMoveCommand("Horizontal", -1);
+          break;
+        case "S":
+        case "s":
+          sendMoveCommand("Vertical", -1);
+          break;
+        case "D":
+        case "d":
+          sendMoveCommand("Horizontal", 1);
+          break;
+        case "Q":
+        case "q":
+          sendRotationCommand(-1);
+          break;
+        case "E":
+        case "e":
+          sendRotationCommand(1);
+          break;
+        default:
+          // Handle other keys if necessary
+          break;
+      }
+
+      //Set the variable to change the color of the button
+      if (
+        ["W", "w", "A", "a", "S", "s", "D", "d", "Q", "q", "E", "e"].includes(
+          event.key
+        )
+      ) {
+        setActiveKeys((prevKeys) => ({
+          ...prevKeys,
+          [event.key.toUpperCase()]: true,
+        }));
+      }
+    };
+
+    const handleKeyup = (event) => {
+      // Check if the event target is the message input, and if so, exit early
+      if (event.target.id === "message-text-box") {
+        return;
+      }
+      switch (event.key) {
+        case "W":
+        case "w":
+        case "S":
+        case "s":
+          sendMoveCommand("Vertical", 0);
+          break;
+        case "A":
+        case "a":
+        case "D":
+        case "d":
+          sendMoveCommand("Horizontal", 0);
+          break;
+        case "Q":
+        case "q":
+        case "E":
+        case "e":
+          sendRotationCommand(0);
+          break;
+        default:
+          // Handle other keys if necessary
+          break;
+      }
+
+      //Set the variable to change the color of the button
+      if (
+        ["W", "w", "A", "a", "S", "s", "D", "d", "Q", "q", "E", "e"].includes(
+          event.key
+        )
+      ) {
+        setActiveKeys((prevKeys) => ({
+          ...prevKeys,
+          [event.key.toUpperCase()]: false,
+        }));
+      }
+    };
+
+    window.addEventListener("keyup", handleKeyup);
+    window.addEventListener("keydown", handleKeydown);
+    return () => {
+      // Cleanup
+      window.removeEventListener("keyup", handleKeyup);
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, []);
 
   // Handle input change
   const handleInputChange = (e) => {
@@ -96,57 +211,85 @@ export default function PlayerControls({ messageHistory, setMessageHistory }) {
             <div className="text-center text-xs font-bold">Strafe</div>
             <div className="grid h-3/4 w-full grid-cols-3 grid-rows-2 gap-0">
               <button
-                className="focus:shadow-outline col-start-2 h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none"
+                className={`focus:shadow-outline col-start-2 h-full w-full place-self-center rounded  font-bold text-white focus:outline-none ${
+                  activeKeys.W
+                    ? "bg-green-500"
+                    : "bg-blue-500 hover:bg-blue-700"
+                }`}
                 onMouseDown={() => {
                   sendMoveCommand("Vertical", 1);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, W: true }));
                 }}
                 onMouseUp={() => {
                   sendMoveCommand("Vertical", 0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, W: false }));
                 }}
                 onMouseLeave={() => {
                   sendMoveCommand("Vertical", 0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, W: false }));
                 }}
               >
                 W
               </button>
               <button
-                className="focus:shadow-outline col-start-1 row-start-2 h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none"
+                className={`focus:shadow-outline col-start-1 row-start-2 h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none ${
+                  activeKeys.A
+                    ? "bg-green-500"
+                    : "bg-blue-500 hover:bg-blue-700"
+                }`}
                 onMouseDown={() => {
                   sendMoveCommand("Horizontal", -1);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, A: true }));
                 }}
                 onMouseUp={() => {
                   sendMoveCommand("Horizontal", 0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, A: false }));
                 }}
                 onMouseLeave={() => {
                   sendMoveCommand("Horizontal", 0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, A: false }));
                 }}
               >
                 A
               </button>
               <button
-                className="focus:shadow-outline col-start-2 row-start-2 h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none"
+                className={`focus:shadow-outline col-start-2 row-start-2 h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none ${
+                  activeKeys.S
+                    ? "bg-green-500"
+                    : "bg-blue-500 hover:bg-blue-700"
+                }`}
                 onMouseDown={() => {
                   sendMoveCommand("Vertical", -1);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, S: true }));
                 }}
                 onMouseUp={() => {
                   sendMoveCommand("Vertical", 0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, S: false }));
                 }}
                 onMouseLeave={() => {
                   sendMoveCommand("Vertical", 0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, S: false }));
                 }}
               >
                 S
               </button>
               <button
-                className="focus:shadow-outline col-start-3 row-start-2 h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none"
+                className={`focus:shadow-outline col-start-3 row-start-2 h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none ${
+                  activeKeys.D
+                    ? "bg-green-500"
+                    : "bg-blue-500 hover:bg-blue-700"
+                }`}
                 onMouseDown={() => {
                   sendMoveCommand("Horizontal", 1);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, D: true }));
                 }}
                 onMouseUp={() => {
                   sendMoveCommand("Horizontal", 0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, D: false }));
                 }}
                 onMouseLeave={() => {
                   sendMoveCommand("Horizontal", 0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, D: false }));
                 }}
               >
                 D
@@ -161,32 +304,46 @@ export default function PlayerControls({ messageHistory, setMessageHistory }) {
             <div className="text-center text-xs font-bold">Rotate</div>
             <div className="grid h-3/4 w-full grid-cols-2 gap-2">
               <button
-                className="box-border h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none"
+                className={`box-border h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none ${
+                  activeKeys.Q
+                    ? "bg-green-500"
+                    : "bg-blue-500 hover:bg-blue-700"
+                }`}
                 onMouseDown={() => {
                   sendRotationCommand(-1);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, L: true }));
                 }}
                 onMouseUp={() => {
                   sendRotationCommand(0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, L: false }));
                 }}
                 onMouseLeave={() => {
                   sendRotationCommand(0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, L: false }));
                 }}
               >
-                L
+                Q
               </button>
               <button
-                className="box-border h-full w-full place-self-center rounded bg-blue-500 font-bold text-white hover:bg-blue-700 focus:outline-none"
+                className={`box-border h-full w-full place-self-center rounded font-bold text-white  focus:outline-none bg-blue-500 hover:bg-blue-700 ${
+                  activeKeys.E
+                    ? "bg-green-500"
+                    : "bg-blue-500 hover:bg-blue-700"
+                }`}
                 onMouseDown={() => {
                   sendRotationCommand(1);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, R: true }));
                 }}
                 onMouseUp={() => {
                   sendRotationCommand(0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, R: false }));
                 }}
                 onMouseLeave={() => {
                   sendRotationCommand(0);
+                  setActiveKeys((prevKeys) => ({ ...prevKeys, R: false }));
                 }}
               >
-                R
+                E
               </button>
             </div>
           </div>
